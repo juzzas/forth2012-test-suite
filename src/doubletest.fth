@@ -64,7 +64,7 @@ T{ $-12AbCdEf. -> -313249263. }T
 T{ %10010110. -> 150. }T
 T{ %-10010110. -> -150. }T
 \ Check BASE is unchanged
-T{ BASE @ OLD-DBASE @ = -> <TRUE> }T
+T{ BASE @ OLD-DBASE @ = -> TRUE }T
 
 \ Repeat in Hex mode
 16 OLD-DBASE ! 16 BASE !
@@ -75,7 +75,7 @@ T{ $-12AbCdEf. -> -12ABCDef. }T
 T{ %10010110. -> 96. }T
 T{ %-10010110. -> -96. }T
 \ Check BASE is unchanged
-T{ BASE @ OLD-DBASE @ = -> <TRUE> }T   \ 2
+T{ BASE @ OLD-DBASE @ = -> TRUE }T   \ 2
 
 DECIMAL
 \ Check number prefixes in compile mode

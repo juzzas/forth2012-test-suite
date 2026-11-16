@@ -163,7 +163,7 @@ TESTING UNESCAPE
 CREATE SUBBUF 48 CHARS ALLOT
 
 \ $CHECK AND $CHECKN return f = 0 if caddr1 = SUBBUF and string1 = string2
-: $CHECK   ( caddr1 u1 caddr2 u2 -- f )  2SWAP OVER SUBBUF <> >R COMPARE R> or ;
+: $CHECK   ( caddr1 u1 caddr2 u2 -- f )  2SWAP OVER SUBBUF <> >R COMPARE R> OR ;
 : $CHECKN  ( caddr1 u1 n caddr2 u2 -- f n )  ROT >R $CHECK R> ;
 
 T{ 123 SUBBUF C! $" " SUBBUF UNESCAPE SUBBUF 0 $CHECK -> FALSE }T
@@ -247,17 +247,17 @@ T{ $" abc%mac3%d" SUBBUF 10 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T
 \ Note that variables are used to avoid complicated stack manipulations
 
 VARIABLE sdest       \ Holds dest address for SUBSTITUTE
-20 constant ssize
+20 CONSTANT ssize
 2VARIABLE $sresult   VARIABLE #subst   \ Hold output from SUBSTITUTE
 
 \ sinit set ups addresses and inputs for SUBSTITUTE and saves the
 \ output destination for check-subst
-\     srcn and destn are offsets into the substitution buffer subbuf
+\     srcn and destn are offsets into the substitution buffer SUBBUF
 \     (caddr1 u1) is the input string for SUBSTITUTE
 
 : sinit  ( caddr1 u1 srcn destn -- src u1 dest size )
-   CHARS subbuf + sdest !        ( -- caddr1 u1 srcn )
-   CHARS subbuf + 2DUP 2>R       ( -- caddr1 u1 src ) ( R: -- u1 src )
+   CHARS SUBBUF + sdest !        ( -- caddr1 u1 srcn )
+   CHARS SUBBUF + 2DUP 2>R       ( -- caddr1 u1 src ) ( R: -- u1 src )
    SWAP CHARS MOVE               ( -- )
    R> R> sdest @ ssize           ( -- src u1 dest size) ( R: -- )
 ;
@@ -277,15 +277,15 @@ VARIABLE sdest       \ Holds dest address for SUBSTITUTE
 
 \ Testing the helpers sinit and check-subst
 
-T{ $" abcde" 2 6 sinit -> subbuf 2 chars + 5 subbuf 6 chars + ssize }T
-T{ $" abcde" subbuf 2 chars + over compare -> 0 }T
-T{ sdest @ -> subbuf 6 chars + }T
+T{ $" abcde" 2 6 sinit -> SUBBUF 2 CHARS + 5 SUBBUF 6 CHARS + ssize }T
+T{ $" abcde" SUBBUF 2 CHARS + OVER COMPARE -> 0 }T
+T{ sdest @ -> SUBBUF 6 CHARS + }T
 
 T{ -78 #subst ! 0 0 0 check-subst -> TRUE }T
-T{ 5 #subst ! $" def" over sdest ! 2dup $sresult 2! 5 check-subst -> TRUE }T
-T{ 5 #subst ! $" def" over sdest ! 2dup $sresult 2! 4 check-subst -> FALSE }T
-T{ 5 #subst ! $" def" over sdest ! 2dup 1+ $sresult 2! 5 check-subst -> FALSE }T
-T{ 5 #subst ! $" def" over sdest ! 2dup 1- $sresult 2! 3 check-subst -> FALSE }T
+T{ 5 #subst ! $" def" OVER sdest ! 2DUP $sresult 2! 5 check-subst -> TRUE }T
+T{ 5 #subst ! $" def" OVER sdest ! 2DUP $sresult 2! 4 check-subst -> FALSE }T
+T{ 5 #subst ! $" def" OVER sdest ! 2DUP 1+ $sresult 2! 5 check-subst -> FALSE }T
+T{ 5 #subst ! $" def" OVER sdest ! 2DUP 1- $sresult 2! 3 check-subst -> FALSE }T
 
 \ Testing overlapping SUBSTITUTE
 
@@ -302,10 +302,9 @@ T{ $" e%mac2%f" 0 3 do-subst $" ezyxf"     1 check-subst -> TRUE }T
 T{ $" abcdefgh" 0 0 do-subst $" abcdefgh"  0 check-subst -> TRUE }T
 T{ $" i%mac3%j" 3 0 do-subst $" izyxwvutj" 1 check-subst -> TRUE }T
 T{ $" k%mac3%l" 9 0 do-subst $" kzyxwvutl" 1 check-subst -> TRUE }T
-
 \ Simulating a failing overlapping SUBSTITUTE
 
-T{ $" pqrst" 2dup 0 0 do-subst -78 #subst ! 0 check-subst -> TRUE }T
+T{ $" pqrst" 2DUP 0 0 do-subst -78 #subst ! 0 check-subst -> TRUE }T
 
 \ Using SUBSTITUTE to define a name whose (caddr u) is on the stack
 : $CREATE  ( caddr u -- )
@@ -313,8 +312,8 @@ T{ $" pqrst" 2dup 0 0 do-subst -78 #subst ! 0 check-subst -> TRUE }T
    S" CREATE %name%" SUBBUF 40 SUBSTITUTE
    0 > IF EVALUATE THEN
 ;
-t{ $" SUBST2" $CREATE 123 , -> }t
-t{ SUBST2 @ -> 123 }t
+T{ $" SUBST2" $CREATE 123 , -> }T
+T{ SUBST2 @ -> 123 }T
 
 \ ------------------------------------------------------------------------------
 

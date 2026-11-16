@@ -245,7 +245,7 @@ T{ FLUSH -> }T
 : BLANK-BUFFER ( blk -- blk-addr )
     BUFFER DUP 1024 BL FILL ;
 
-\ Test R/W of a Simple Blank Random Block
+TESTING Test R/W of a Simple Blank Random Block
 T{ RND-TEST-BLOCK                 \ blk
    DUP BLANK-BUFFER               \ blk blk-addr1
    1024 ELF-HASH                  \ blk hash
@@ -253,7 +253,7 @@ T{ RND-TEST-BLOCK                 \ blk
    SWAP BLOCK                     \ hash blk-addr2
    1024 ELF-HASH = -> TRUE }T
 
-\ Boundary Test: Modify first character
+TESTING Boundary Test: Modify first character
 T{ RND-TEST-BLOCK                  \ blk
    DUP BLANK-BUFFER                \ blk blk-addr1
    CHAR \ OVER C!                  \ blk blk-addr1
@@ -262,7 +262,7 @@ T{ RND-TEST-BLOCK                  \ blk
    SWAP BLOCK                      \ hash blk-addr2
    1024 ELF-HASH = -> TRUE }T
 
-\ Boundary Test: Modify last character
+TESTING Boundary Test: Modify last character
 T{ RND-TEST-BLOCK                  \ blk
    DUP BLANK-BUFFER                \ blk blk-addr1
    CHAR \ OVER 1023 CHARS + C!     \ blk blk-addr1
@@ -271,7 +271,7 @@ T{ RND-TEST-BLOCK                  \ blk
    SWAP BLOCK                      \ hash blk-addr2
    1024 ELF-HASH = -> TRUE }T
 
-\ Boundary Test: First and Last (and all other) blocks in the test range
+TESTING Boundary Test: First and Last (and all other) blocks in the test range
 1024 8 * BITS/CELL / CONSTANT CELLS/BLOCK
 
 : PREPARE-RND-BLOCK ( hash blk -- hash' )
@@ -301,23 +301,28 @@ T{ LIMIT-TEST-BLOCK FIRST-TEST-BLOCK WRITE-RND-BLOCKS-WITH-HASH FLUSH
     SWAP BLOCK                     \ hash blk-addr2
     1024 ELF-HASH = ;              \ TRUE
 
-\ Double UPDATE make no difference
+TESTING Double UPDATE make no difference
 : TUF1-1 ( -- ) UPDATE UPDATE FLUSH ;
 T{ ' TUF1-1 RND-TEST-BLOCK TUF1 -> TRUE }T
 
-\ Double FLUSH make no difference
+TESTING Double FLUSH make no difference
 : TUF1-2 ( -- ) UPDATE FLUSH FLUSH ;
 T{ ' TUF1-2 RND-TEST-BLOCK TUF1 -> TRUE }T
 
-\ FLUSH only saves UPDATEd buffers
+TESTING FLUSH only saves UPDATEd buffers
 T{ RND-TEST-BLOCK                      \ blk
+CR .( 1> ) .S
    0 OVER PREPARE-RND-BLOCK            \ blk hash
+CR .( 2> ) .S
    UPDATE FLUSH                        \ blk hash
+CR .( 3> ) .S
    OVER 0 SWAP PREPARE-RND-BLOCK DROP  \ blk hash
+CR .( 4> ) .S
    FLUSH ( with no preliminary UPDATE) \ blk hash
+CR .( 5> ) .S
    SWAP BLOCK 1024 ELF-HASH = -> TRUE }T
 
-\ UPDATE only marks the current block buffer
+TESTING UPDATE only marks the current block buffer
 \ This test needs at least 2 distinct buffers, though this is not a
 \ requirement of the language specification.  If 2 distinct buffers
 \ are not returned, then the tests quits with a trivial Pass
@@ -341,21 +346,24 @@ T{ RND-TEST-BLOCK                      \ blk
 
 : 2= ( x1 x2 x3 x4 -- flag )
     ROT = ROT ROT = AND ;
-
+TESTING (no updates)
 : TUF2-0 ( blk1 blk2 -- blk1 blk2 ) ;   \ no updates
 T{ ' TUF2-0 2RND-TEST-BLOCKS TUF2       \ run test procedure
    2SWAP 2DROP 2= -> TRUE }T            \ compare expected and actual
 
+TESTING (blk1 only)
 : TUF2-1 ( blk1 blk2 -- blk1 blk2 )     \ update blk1 only
     OVER BLOCK DROP UPDATE ;
 T{ ' TUF2-1 2RND-TEST-BLOCKS TUF2       \ run test procedure
    SWAP DROP SWAP DROP 2= -> TRUE }T
 
+TESTING (blk2 only)
 : TUF2-2 ( blk1 blk2 -- blk1 blk2 )     \ update blk2 only
     DUP BUFFER DROP UPDATE ;
 T{ ' TUF2-2 2RND-TEST-BLOCKS TUF2       \ run test procedure
    DROP ROT DROP SWAP 2= -> TRUE }T
 
+TESTING (blk1 and blk2)
 : TUF2-3 ( blk1 blk2 -- blk1 blk2 )     \ update blk1 and blk2
     TUF2-1 TUF2-2 ;
 T{ ' TUF2-3 2RND-TEST-BLOCKS TUF2       \ run test procedure

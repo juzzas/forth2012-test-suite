@@ -200,12 +200,12 @@ T{ FN1 FILE-STATUS SWAP DROP 0= -> FALSE }T
 T{ FN3 FILE-STATUS SWAP DROP 0= -> TRUE }T  \ Return value is undefined
 T{ FN3 R/W OPEN-FILE SWAP FID1 ! -> 0 }T
 T{ >END -> 0 }T
-T{ S" Final line" fid1 @ WRITE-LINE -> 0 }T
+T{ S" Final line" FID1 @ WRITE-LINE -> 0 }T
 T{ FID1 @ FLUSH-FILE -> 0 }T      \ Can only test FLUSH-FILE doesn't fail
 T{ FID1 @ CLOSE-FILE -> 0 }T
 
 \ Tidy the test folder
-T{ fn3 DELETE-FILE DROP -> }T
+T{ FN3 DELETE-FILE DROP -> }T
 
 \ ------------------------------------------------------------------------------
 TESTING REQUIRED REQUIRE INCLUDED
@@ -275,7 +275,17 @@ TESTING nested SAVE-INPUT, RESTORE-INPUT and REFILL from a file
    ABORT" REFILL FAILED"
 ;
 
-0 SI_INC !
+\ SI_INC and friends may have been defined in core-ext tests
+[?DEF] SI_INC
+\? VARIABLE SI_INC 0 SI_INC !
+\? 
+\? : SI1
+\?   SI_INC @ >IN +!
+\?    15 SI_INC !
+\? ;
+\? 
+\? : S$ S" SAVE-INPUT SI1 RESTORE-INPUT 12345" ;
+
 
 CREATE 2RES -1 , -1 ,   \ Don't use 2VARIABLE from Double number word set 
 
